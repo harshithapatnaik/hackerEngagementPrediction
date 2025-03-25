@@ -10,7 +10,8 @@ import timing
 
 
 # TODO: Needs to be modified
-def query_data(user_posts_threshold: int, user_threads_threshold: int, thread_posts_threshold: int, thread_users_threshold: int, forum_id: int):
+def query_data(user_posts_threshold: int, user_threads_threshold: int, thread_posts_threshold: int,
+               thread_users_threshold: int, forum_id: int):
     """
     Gets data from database and trims it based on below parameters.
     :param user_posts_threshold: The amount of posts a user must post else trimmed from dataset
@@ -40,41 +41,39 @@ def query_data(user_posts_threshold: int, user_threads_threshold: int, thread_po
             WHERE t.forum_id = ' + str(forum_id) + ' \
             GROUP BY p.user_id \
             HAVING COUNT(p.post_id) >= ' + str(user_posts_threshold) + \
-            ' AND COUNT(DISTINCT p.topic_id) >= ' + str(user_threads_threshold) + ''
-    # get_users_query = 'select users_id from posts \
-    #         where forums_id = ' + str(forum_id) + ' \
-    #         group by users_id \
-    #         having count(posts_id) >= ' + str(user_posts_threshold) + ' and count(distinct topics_id) >= ' \
-    #                   + str(user_threads_threshold) + ''
+                      ' AND COUNT(DISTINCT p.topic_id) >= ' + str(user_threads_threshold) + ''
     print(get_users_query)
 
-    users = get_q(get_users_query, 'users_id', 'posts')
+    users = get_q(get_users_query, 'user_id', 'posts')
 
-    get_threads_query = 'select topics_id, posts_id, users_id, posted_date ' \
+    get_threads_query = 'select topic_id, post_id, user_id, dateadded_post ' \
                         'from posts ' \
-                        'where topics_id in (' \
-                        'select distinct topics_id ' \
-                        'from posts ' \
-                        'where forums_id = ' + str(forum_id) + ' and topics_id in ( ' \
-                                                               'select distinct topics_id ' \
-                                                               'from posts ' \
-                                                               'where forums_id = ' + str(
-        forum_id) + ' and users_id in (' \
-                    'select users_id ' \
-                    'from posts ' \
-                    'where forums_id = ' + str(forum_id) + ' ' \
-                                                           'group by users_id ' \
-                                                           'having count(posts_id) >= ' + str(
-        user_posts_threshold) + ' and count(distinct topics_id) >= ' \
+                        'where topic_id in ( ' \
+                        'select distinct p.topic_id ' \
+                        'from posts p ' \
+                        'join topics t on p.topic_id = t.topic_id ' \
+                        'where t.forum_id = ' + str(forum_id) + ' and p.topic_id in ( ' \
+                                                                'select distinct p.topic_id ' \
+                                                                'from posts p ' \
+                                                                'join topics t on p.topic_id = t.topic_id ' \
+                                                                'where t.forum_id = ' + str(
+        forum_id) + ' and p.user_id in (' \
+                    'select p.user_id ' \
+                    'from posts p ' \
+                    'join topics t on p.topic_id = t.topic_id ' \
+                    'where t.forum_id = ' + str(forum_id) + ' ' \
+                                                            'group by p.user_id ' \
+                                                            'having count(p.post_id) >= ' + str(
+        user_posts_threshold) + ' and count(distinct p.topic_id) >= ' \
                         + str(user_threads_threshold) + ')' \
                                                         ') ' \
-                                                        'group by topics_id ' \
-                                                        'having count(posts_id) >= ' + str(
-        thread_posts_threshold) + ' and count(distinct users_id) >= ' \
-                        + str(thread_users_threshold) + '' \
+                                                        'group by p.topic_id ' \
+                                                        'having count(p.post_id) >= ' + str(
+        thread_posts_threshold) + ' and count(distinct p.user_id) >= ' \
+                        + str(thread_users_threshold) + ' ' \
                                                         ') ' \
-                                                        'order by posted_date asc'
-
+                                                        'order by dateadded_post asc'
+    print(get_threads_query)
     users_ids = []
 
     # find a way to remove this. its just getting a list of user id's. All one-liners tested returned lists of lists
@@ -83,10 +82,9 @@ def query_data(user_posts_threshold: int, user_threads_threshold: int, thread_po
         # check if user_id is in relevant users, else continue
         users_ids.append(post['user_id'])
 
-    # print(get_threads_query)
-    posts = get_q(get_threads_query, ['topics_id', 'posts_id', 'users_id', 'posted_date'], 'posts')
+    posts = get_q(get_threads_query, ['topic_id', 'post_id', 'user_id', 'dateadded_post'], 'posts')
 
-    timing.print_timing("Get from DB")
+    # timing.print_timing("Get from DB")
     return users_ids, posts
 
 
@@ -105,11 +103,16 @@ def create_thread_info(users, posts):
     # dictionary for holding info as: key = topics_id, vals = users_id
     thread_info = {}
 
+    # Process only the first 1000 records... just to test. remove this
+    limited_posts = posts.iloc[:10]
+    print(len(limited_posts))
+
+    print(len(posts))
     # Turn loose posts into dictionary of threads with posts in order
-    for index, post in posts.iterrows():
-        users_id = post['users_id']
-        topics_id = post['topics_id']
-        posted_date = post['posted_date']
+    for index, post in limited_posts.iterrows():  #modify to posts.iterrows()
+        users_id = post['user_id']
+        topics_id = post['topic_id']
+        posted_date = post['dateadded_post']
 
         # this is a filtering workaround
         # ignore nodes that are not in the initially queried users list
@@ -135,6 +138,7 @@ def create_network(thread_info):
     :return:
     """
     g = nx.MultiDiGraph()
+    postCount = 0 #remove this line
     for topics_id in thread_info:
         # for every post in topic, when someone replies to a post, they are influence-able by everyone who posted before
         user_list = set()
@@ -156,13 +160,17 @@ def create_network(thread_info):
                 # diff - diff between it and prev. Diff between new and then? Just the date?
                 # date by which influence was received
                 g.add_edge(users_id, user, topic=topics_id, date=date)
-    timing.print_timing("Collect ThreadInfo")
+            postCount += 1 #remove this line
+        if postCount >= 20: #remove this
+            break #remove this
+        print("im here2")
+    # timing.print_timing("Collect ThreadInfo")
+    print(len(g.nodes))
     if len(g.nodes) < 20:
+        print("im here")
         nx.draw(g, with_labels=True)
         plt.show()
     return g
-
-
 
 ### my notes
 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # Establishing connection to the PostgreSQL database
 conn = psycopg2.connect(
-dbname= "darkweb_markets_forums1",
+dbname= "darkweb_markets_forums2",
 user="postgres",
 password="#arshly4P",
 host="localhost",
@@ -21,6 +21,7 @@ unique_user_requirement = 10
 query = f"select p.user_id, count(p.post_id), count(distinct p.topic_id) from posts p inner join topics t on t.topic_id = p.topic_id " \
         f"where t.forum_id = {forum_id} and length(content_post) > 10 and classification_topic >= 0.5 " \
         f"group by p.user_id"
+
 # Executing the query
 cursor.execute(query)
 

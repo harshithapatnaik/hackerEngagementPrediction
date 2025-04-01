@@ -109,7 +109,7 @@ def create_thread_info(users, posts):
 
     print(len(posts))
     # Turn loose posts into dictionary of threads with posts in order
-    for index, post in limited_posts.iterrows():  #modify to posts.iterrows()
+    for index, post in posts.iterrows():
         users_id = post['user_id']
         topics_id = post['topic_id']
         posted_date = post['dateadded_post']
@@ -138,7 +138,7 @@ def create_network(thread_info):
     :return:
     """
     g = nx.MultiDiGraph()
-    postCount = 0 #remove this line
+    # postCount = 0 #remove this line
     for topics_id in thread_info:
         # for every post in topic, when someone replies to a post, they are influence-able by everyone who posted before
         user_list = set()
@@ -160,10 +160,10 @@ def create_network(thread_info):
                 # diff - diff between it and prev. Diff between new and then? Just the date?
                 # date by which influence was received
                 g.add_edge(users_id, user, topic=topics_id, date=date)
-            postCount += 1 #remove this line
-        if postCount >= 20: #remove this
-            break #remove this
-        print("im here2")
+        #     postCount += 1 #remove this line
+        # if postCount >= 20: #remove this
+        #     break #remove this
+        # print("im here2")
     # timing.print_timing("Collect ThreadInfo")
     print(len(g.nodes))
     if len(g.nodes) < 20:

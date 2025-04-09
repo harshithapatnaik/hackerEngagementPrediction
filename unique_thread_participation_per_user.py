@@ -9,7 +9,9 @@ def plot_unique_thread_participation(forum_id):
         FROM posts p
         JOIN topics t ON p.topic_id = t.topic_id
         WHERE t.forum_id = %s
-        GROUP BY p.user_id;
+        AND length(content_post) > 10 AND classification_topic >= 0.5
+        GROUP BY p.user_id
+        HAVING COUNT(DISTINCT p.topic_id) > 2;
     """
 
     df = get_q(query, params=(forum_id,))
@@ -19,11 +21,11 @@ def plot_unique_thread_participation(forum_id):
         return
 
     # Define bins and labels for the analysis
-    bins = [1, 2, 3, 4, 5, 10, 20, 50, 100, 200, 500, 1000, float('inf')]
-    labels = ['1', '2', '3', '4', '5+', '10+', '20+', '50+', '100+', '200+', '500+', '1000+']
+    bins = [3, 4, 5, 10, 20, 50, 100, 200, 500, 1000, float('inf')]
+    labels = ['3', '4', '5+', '10+', '20+', '50+', '100+', '200+', '500+', '1000+']
 
     # Bin the users based on unique thread participation
-    df['bins'] = pd.cut(df['thread_count'], bins=bins, labels=labels, right=True)
+    df['bins'] = pd.cut(df['thread_count'], bins=bins, labels=labels, right=False)
 
     # Count users per bin
     user_counts = df['bins'].value_counts().reindex(labels).fillna(0)
@@ -43,4 +45,4 @@ def plot_unique_thread_participation(forum_id):
 
 # Specify forum id here
 if __name__ == "__main__":
-    plot_unique_thread_participation(8)
+    plot_unique_thread_participation(11)

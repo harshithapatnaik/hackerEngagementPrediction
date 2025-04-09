@@ -84,7 +84,7 @@ def query_data(user_posts_threshold: int, user_threads_threshold: int, thread_po
 
     posts = get_q(get_threads_query, ['topic_id', 'post_id', 'user_id', 'dateadded_post'], 'posts')
 
-    # timing.print_timing("Get from DB")
+    timing.print_timing("Get from DB")
     return users_ids, posts
 
 
@@ -164,7 +164,7 @@ def create_network(thread_info):
         # if postCount >= 20: #remove this
         #     break #remove this
         # print("im here2")
-    # timing.print_timing("Collect ThreadInfo")
+    timing.print_timing("Collect ThreadInfo")
     print(len(g.nodes))
     if len(g.nodes) < 20:
         print("im here")

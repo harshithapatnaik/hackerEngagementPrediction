@@ -1,6 +1,6 @@
 DATABASE:
   HOST: "localhost"
-  DATABASE: "darkweb_markets_forums1"
+  DATABASE: "darkweb_markets_forums2"
   USER: "postgres"
   PASSWORD: "#arshly4P"
 

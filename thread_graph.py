@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # Establishing connection to the PostgreSQL database
 conn = psycopg2.connect(
-dbname= "darkweb_markets_forums1",
+dbname= "darkweb_markets_forums2",
 user="postgres",
 password="#arshly4P",
 host="localhost",

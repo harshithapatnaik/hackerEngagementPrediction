@@ -9,8 +9,10 @@ def plot_posts_per_user_forum(forum_id):
         SELECT p.user_id, COUNT(p.post_id) AS num_posts
         FROM posts p
         JOIN topics t ON p.topic_id = t.topic_id
-        WHERE t.forum_id = %s
-        GROUP BY p.user_id;
+        WHERE t.forum_id = %s 
+        AND length(content_post) > 10 AND classification_topic >= 0.5
+        GROUP BY p.user_id
+        HAVING COUNT(p.post_id) > 2;
     """
 
     # Load data into DataFrame
@@ -19,11 +21,11 @@ def plot_posts_per_user_forum(forum_id):
         print("No data found or there was an error executing the query.")
 
     # Define bins for categorizing users by posts count
-    bins = [1, 2, 3, 4, 5, 10, 20, 50, 100, 200, 500, 1000, float('inf')]
-    labels = ['1', '2', '3', '4', '5+', '10+', '20+', '50+', '100+', '200+', '500+', '1000+']
+    bins = [3, 4, 5, 10, 20, 50, 100, 200, 500, 1000, float('inf')]
+    labels = ['3', '4', '5+', '10+', '20+', '50+', '100+', '200+', '500+', '1000+']
 
     # Categorize data into bins
-    df['bins'] = pd.cut(df['num_posts'], bins=bins, labels=labels, right=True)
+    df['bins'] = pd.cut(df['num_posts'], bins=bins, labels=labels, right=False)
 
     # Count users per bin and reorder correctly
     posts_per_user = df['bins'].value_counts().reindex(labels).fillna(0)
@@ -43,4 +45,4 @@ def plot_posts_per_user_forum(forum_id):
 
 # Specify forum id here
 if __name__ == "__main__":
-    plot_posts_per_user_forum(8)
+    plot_posts_per_user_forum(11)

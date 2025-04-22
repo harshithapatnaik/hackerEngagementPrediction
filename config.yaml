@@ -5,30 +5,32 @@ DATABASE:
   PASSWORD: "#arshly4P"
 
 FORUM:
-  ID: "2"
-  POST_THRESHOLD: "0"
+  ID: 2
+  POST_THRESHOLD: 0
+
+FILTERS:
+  ENABLED: [0, 1, 2, 3]  # Choose from 0 to 4, based on filter indices
 
 NETWORK:
-  USER_POSTS_THRESHOLD: "1"
-  USER_THREADS_THRESHOLD: "1"
-  THREAD_POSTS_THRESHOLD: "1"
-  THREAD_USERS_THRESHOLD: "1"
+  USER_POSTS_THRESHOLD: 1
+  USER_THREADS_THRESHOLD: 1
+  THREAD_POSTS_THRESHOLD: 1
+  THREAD_USERS_THRESHOLD: 1
 
 TAO:
-  SUSCEPTIBLE: "8760"  # Number of hours
-  FORGETTABLE: "8760"  # Number of hours
+  SUSCEPTIBLE: 8760  # in hours
+  FORGETTABLE: 8760  # in hours
 
-FEATURE:
-  NAN: "True"
-  PNE: "True"
-  HUB: "False"
+FEATURES:
+  NAN: true
+  PNE: true
+  HUB: false
 
 DATE:
   BEGIN: "2000-06-01"
   END: "2020-10-31"
 
 HYPERPARAMS_ET:
-  N_ESTIMATORS: "100"
-  sqrt: "auto"
-  MIN_SAMPLES_SPLIT: "2"
-
+  N_ESTIMATORS: 100
+  SQRT: "auto"
+  MIN_SAMPLES_SPLIT: 2

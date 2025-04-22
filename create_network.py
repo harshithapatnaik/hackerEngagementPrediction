@@ -8,7 +8,7 @@ from connect import get_q
 from matplotlib import pyplot as plt
 import timing
 
-
+####### This file is not needed. Testing purpose only!!
 # TODO: Needs to be modified
 def query_data(user_posts_threshold: int, user_threads_threshold: int, thread_posts_threshold: int,
                thread_users_threshold: int, forum_id: int):

@@ -1,8 +1,9 @@
 from build_network import build_thread_info, create_user_influence_network, print_full_network
-from sampling import advanced_balanced_sampling
+from sampling import balanced_sampling
 import config
 import pandas as pd
 from filters import apply_filters
+from features import compute_features_for_pairs
 
 # Load config values
 cfg = config.get_config_all(config)
@@ -21,7 +22,7 @@ graph = create_user_influence_network(thread_info)
 thread_list = list(thread_info.keys())
 
 # Run balanced sampling
-dataset = advanced_balanced_sampling(
+dataset = balanced_sampling(
     thread_info=thread_info,
     G=graph,
     t_sus=t_sus,
@@ -36,3 +37,15 @@ print(df['label'].value_counts())
 print(df.sample(min(5, len(df))))
 # print_full_network(graph)
 
+# Compute influence features and save to training set
+training_df = compute_features_for_pairs(
+    pairs_df=df,
+    graph=graph,
+    thread_info=thread_info,
+    t_sus=t_sus,
+    t_fos=t_fos,
+    output_path="outputs/training_set.csv"
+)
+
+print("Features generated:")
+print(training_df.head())

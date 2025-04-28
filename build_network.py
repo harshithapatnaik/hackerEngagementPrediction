@@ -69,7 +69,7 @@ def create_user_influence_network(thread_info):
                         from_user=user_j
                     )
 
-    print(f"✅ Graph built: {g.number_of_nodes()} users, {g.number_of_edges()} connections.")
+    print(f"Graph built: {g.number_of_nodes()} users, {g.number_of_edges()} connections.")
 
     if len(g.nodes) <= 20:
         nx.draw(g, with_labels=True, node_size=600, font_size=8)

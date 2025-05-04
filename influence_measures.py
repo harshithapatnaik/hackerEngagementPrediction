@@ -15,37 +15,45 @@ filters_enabled = list(map(int, cfg["FILTERS"]["ENABLED"]))
 # Apply filters
 allowed_users, allowed_topics = apply_filters(forum_id, filters_enabled)
 
-
 # Build thread info and influence network
 thread_info = build_thread_info(forum_id, allowed_users, allowed_topics)
 graph = create_user_influence_network(thread_info)
 thread_list = list(thread_info.keys())
 
-# Run balanced sampling
-dataset = balanced_sampling(
+# Run balanced sampling — this also writes to outputs/balanced_samples.csv and outputs/imbalanced_samples.csv
+_ = balanced_sampling(
     thread_info=thread_info,
     G=graph,
     t_sus=t_sus,
     t_fos=t_fos,
-    max_pairs=500,
-    output_file="outputs/balanced_samples.csv"
+    max_pairs=500
 )
 
-# Preview output
-df = pd.read_csv("outputs/balanced_samples.csv")
-print(df['label'].value_counts())
-print(df.sample(min(5, len(df))))
-# print_full_network(graph)
+# Load balanced sample
+df_balanced = pd.read_csv("outputs/balanced_samples.csv")
+print("Balanced sample stats:")
+print(df_balanced['label'].value_counts())
+print(df_balanced.sample(min(5, len(df_balanced))))
 
-# Compute influence features and save to training set
-training_df = compute_features_for_pairs(
-    pairs_df=df,
-    graph=graph,
+# Extract features for balanced set
+features_balanced = compute_features_for_pairs(
+    df=df_balanced,
+    G=graph,
     thread_info=thread_info,
     t_sus=t_sus,
     t_fos=t_fos,
-    output_path="outputs/training_set.csv"
+    output_path="outputs/features_on_balanced.csv"
 )
 
-print("Features generated:")
-print(training_df.head())
+# Extract features for imbalanced set
+df_imbalanced = pd.read_csv("outputs/imbalanced_samples.csv")
+features_imbalanced = compute_features_for_pairs(
+    df=df_imbalanced,
+    G=graph,
+    thread_info=thread_info,
+    t_sus=t_sus,
+    t_fos=t_fos,
+    output_path="outputs/features_on_imbalanced.csv"
+)
+
+print("Feature generation complete.")

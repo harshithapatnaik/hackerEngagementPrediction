@@ -26,6 +26,22 @@ train_df, test_df_balanced = train_test_split(
     balanced_df, test_size=0.2, stratify=balanced_df['label'], random_state=42
 )
 
+# # Count the number of positive samples in the 20% test split
+# num_positives = test_df_balanced[test_df_balanced['label'] == 1].shape[0]
+#
+# # To achieve a 1:51 positive-to-negative ratio, calculate the number of required negatives
+# desired_negatives = 51 * num_positives
+#
+# # Sample required number of negative samples from the imbalanced dataset
+# imbalanced_negatives = imbalanced_df[imbalanced_df['label'] == 0]
+# sampled_negatives = imbalanced_negatives.sample(n=desired_negatives, random_state=42)
+#
+# # Combine the positives from the balanced test split with the new negatives
+# test_df = pd.concat([
+#     test_df_balanced[test_df_balanced['label'] == 1],
+#     sampled_negatives
+# ], ignore_index=True)
+
 test_df = pd.concat([
         test_df_balanced,
         imbalanced_df[imbalanced_df['label'] == 0]
@@ -48,7 +64,7 @@ models = {
     'KNN': KNeighborsClassifier(n_neighbors=5),
     'NB': GaussianNB(),
     'XGB': XGBClassifier(use_label_encoder=False, eval_metric='logloss', random_state=42),
-    'MLP': MLPClassifier(hidden_layer_sizes=(64,), solver='adam', max_iter=500, random_state=42)
+    'MLP': MLPClassifier(hidden_layer_sizes=(128, 64,), solver='adam', max_iter=500, random_state=42)
 }
 
 # Run each model and store the metrics

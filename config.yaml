@@ -5,8 +5,7 @@ DATABASE:
   PASSWORD: "#arshly4P"
 
 FORUM:
-  ID: 2
-  POST_THRESHOLD: 0
+  ID: 8
 
 FILTERS:
   ENABLED: [0, 1, 2, 3]  # Choose from 0 to 3, based on filter indices
@@ -26,18 +25,10 @@ FEATURE:
   PNE: "True"
   CONTINUOUS_DECAY: "False"
   PREVIOUS_REPOSTS: "False"
-  CLOSED_TRIADS: "False"
-  CLUSTERING: "False"
+  OPT: "True"
+  CLC: "True"
   HUB: "True"
   MUTUAL_REPOSTS: "False"
   SCC_COUNT: "False"
   SCC_RATIO: "False"
 
-#DATE:
-#  BEGIN: "2000-06-01"
-#  END: "2020-10-31"
-#
-#HYPERPARAMS_ET:
-#  N_ESTIMATORS: 100
-#  SQRT: "auto"
-#  MIN_SAMPLES_SPLIT: 2

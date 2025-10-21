@@ -21,7 +21,7 @@ feature_list = [f.lower() for f, enabled in cfg['FEATURE'].items() if enabled ==
 balanced_df = pd.read_csv("outputs/features_on_balanced.csv")
 imbalanced_df = pd.read_csv("outputs/features_on_imbalanced.csv")
 
-# Split the balanced dataset: 80% for training, 20% for testing
+# Split the balanced dataset: 80% for training, 20% + all non-adoptors for testing
 train_df, test_df_balanced = train_test_split(
     balanced_df, test_size=0.2, stratify=balanced_df['label'], random_state=42
 )
